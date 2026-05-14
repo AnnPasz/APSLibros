@@ -12,6 +12,10 @@ APSLibros is a small web app that scans a book barcode (ISBN), deciphers title/a
 - USB barcode scanner support (keyboard-wedge mode)
 - ISBN-10 and ISBN-13 normalization/validation
 - Open Library metadata lookup and autofill
+- Add scanned book to local library
+- Category per book (e.g., crime, romance, non-fiction)
+- Edit and delete saved book records
+- Polish-language application interface
 - Basic unit tests for ISBN parsing helpers
 
 ## Scanning Modes

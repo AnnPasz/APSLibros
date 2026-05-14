@@ -46,6 +46,7 @@
 }
 
 input,
+select,
 button {
   border-radius: 10px;
   border: 1px solid #cbd5e1;
@@ -53,7 +54,8 @@ button {
   padding: 0.6rem 0.8rem;
 }
 
-input {
+input,
+select {
   width: 100%;
 }
 
@@ -66,6 +68,10 @@ button {
 
 button.secondary {
   background: #334155;
+}
+
+button.danger {
+  background: #b91c1c;
 }
 
 button:disabled {
@@ -103,8 +109,41 @@ button:disabled {
   color: #475569;
 }
 
+.library-list {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.library-item {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 0.8rem;
+  background: #f8fafc;
+}
+
+.library-fields {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+.library-fields label {
+  display: grid;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+  color: #334155;
+}
+
+.library-actions {
+  margin-top: 0.8rem;
+}
+
 @media (max-width: 900px) {
   .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .library-fields {
     grid-template-columns: 1fr;
   }
 }

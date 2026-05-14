@@ -67,7 +67,7 @@ export default function IsbnScanner({ enabled, onDetected, onError }: IsbnScanne
           const message =
             cameraError instanceof Error
               ? cameraError.message
-              : "Camera could not start. On iPhone, use Safari over HTTPS and allow camera access.";
+              : "Nie udało się uruchomić kamery. Na iPhonie użyj Safari przez HTTPS i zezwól na dostęp do kamery.";
           onError(message);
         }
       }
@@ -96,12 +96,12 @@ export default function IsbnScanner({ enabled, onDetected, onError }: IsbnScanne
   }, [enabled, onDetected, onError, scannerId]);
 
   if (!enabled) {
-    return <p>Scanner is paused. Click “Start scanner” to use your camera.</p>;
+    return <p>Skaner jest zatrzymany. Kliknij „Uruchom skaner”, aby użyć kamery.</p>;
   }
 
   return (
     <>
-      <p className="help-text">Tip: on iPhone use Safari, allow camera access, and point the back camera at the barcode.</p>
+      <p className="help-text">Wskazówka: na iPhonie użyj Safari, zezwól na kamerę i skieruj tylny aparat na kod kreskowy.</p>
       <div id={scannerId} className="scanner-container" />
     </>
   );

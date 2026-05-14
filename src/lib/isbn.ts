@@ -48,7 +48,7 @@ export function toIsbn13(value: string): string {
   }
 
   if (!isValidIsbn10(value)) {
-    throw new Error("Invalid ISBN format.");
+    throw new Error("Nieprawidłowy format ISBN.");
   }
 
   const base = `978${value.slice(0, 9)}`;
@@ -73,13 +73,13 @@ export async function fetchBookByIsbn(rawIsbn: string): Promise<BookMetadata> {
   const isbn = normalized.length === 10 ? toIsbn13(normalized) : normalized;
 
   if (!isValidIsbn13(isbn)) {
-    throw new Error("ISBN must be a valid ISBN-10 or ISBN-13 code.");
+    throw new Error("ISBN musi być poprawnym kodem ISBN-10 lub ISBN-13.");
   }
 
   const endpoint = `https://openlibrary.org/api/books?bibkeys=ISBN:${isbn}&jscmd=details&format=json`;
   const response = await fetch(endpoint);
   if (!response.ok) {
-    throw new Error("Could not reach Open Library API.");
+    throw new Error("Nie udało się połączyć z API Open Library.");
   }
 
   const payload = (await response.json()) as Record<string, { details?: Record<string, unknown> }>;
@@ -87,7 +87,7 @@ export async function fetchBookByIsbn(rawIsbn: string): Promise<BookMetadata> {
   const details = payload[key]?.details;
 
   if (!details) {
-    throw new Error("No metadata found for this ISBN.");
+    throw new Error("Nie znaleziono metadanych dla podanego ISBN.");
   }
 
   const title = typeof details.title === "string" ? details.title : "";
