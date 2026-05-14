@@ -28,6 +28,11 @@ export default function IsbnScanner({ enabled, onDetected, onError }: IsbnScanne
     let cancelled = false;
 
     const run = async () => {
+      const currentScanner = scanner;
+      if (!currentScanner) {
+        return;
+      }
+
       const scanConfig = {
         fps: 10,
         qrbox: { width: 300, height: 160 },
@@ -36,7 +41,7 @@ export default function IsbnScanner({ enabled, onDetected, onError }: IsbnScanne
       };
 
       try {
-        await scanner.start(
+        await currentScanner.start(
           { facingMode: { exact: "environment" } },
           scanConfig,
           (decodedText) => {
@@ -50,7 +55,7 @@ export default function IsbnScanner({ enabled, onDetected, onError }: IsbnScanne
         }
 
         try {
-          await scanner.start(
+          await currentScanner.start(
             { facingMode: "environment" },
             scanConfig,
             (decodedText) => {
@@ -81,7 +86,9 @@ export default function IsbnScanner({ enabled, onDetected, onError }: IsbnScanne
       void scanner
         .stop()
         .catch(() => undefined)
-        .then(() => scanner?.clear().catch(() => undefined))
+        .then(() => {
+          scanner?.clear();
+        })
         .finally(() => {
           scanner = null;
         });
