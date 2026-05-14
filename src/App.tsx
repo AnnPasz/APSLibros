@@ -278,23 +278,38 @@ export default function App() {
           <div className="form-grid">
             <label>
               ISBN
-              <input value={book.isbn} readOnly />
+              <input
+                value={book.isbn}
+                onChange={(event) => setBook((currentBook) => ({ ...currentBook, isbn: event.target.value }))}
+              />
             </label>
             <label>
               Tytuł
-              <input value={book.title} readOnly />
+              <input
+                value={book.title}
+                onChange={(event) => setBook((currentBook) => ({ ...currentBook, title: event.target.value }))}
+              />
             </label>
             <label>
               Autor
-              <input value={book.author} readOnly />
+              <input
+                value={book.author}
+                onChange={(event) => setBook((currentBook) => ({ ...currentBook, author: event.target.value }))}
+              />
             </label>
             <label>
               Wydawnictwo
-              <input value={book.publisher} readOnly />
+              <input
+                value={book.publisher}
+                onChange={(event) => setBook((currentBook) => ({ ...currentBook, publisher: event.target.value }))}
+              />
             </label>
             <label>
               Rok wydania
-              <input value={book.year} readOnly />
+              <input
+                value={book.year}
+                onChange={(event) => setBook((currentBook) => ({ ...currentBook, year: event.target.value }))}
+              />
             </label>
             <label>
               Kategoria
@@ -310,6 +325,10 @@ export default function App() {
               </select>
             </label>
           </div>
+
+          <p className="help-text" style={{ marginTop: "0.5rem" }}>
+            Jeśli dane się nie uzupełniły automatycznie, wpisz je ręcznie.
+          </p>
 
           <div className="row" style={{ marginTop: "0.9rem" }}>
             <button type="button" onClick={handleAddToLibrary} className="secondary">

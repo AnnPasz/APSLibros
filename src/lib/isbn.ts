@@ -68,6 +68,41 @@ function parseYear(value: string | undefined): string {
   return match?.[0] ?? "";
 }
 
+async function fetchFromGoogleBooks(isbn: string): Promise<Partial<BookMetadata> | null> {
+  try {
+    const endpoint = `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}&maxResults=1`;
+    const response = await fetch(endpoint);
+    if (!response.ok) {
+      return null;
+    }
+
+    const payload = (await response.json()) as { items?: Array<{ volumeInfo?: Record<string, unknown> }> };
+    const volumeInfo = payload.items?.[0]?.volumeInfo;
+
+    if (!volumeInfo) {
+      return null;
+    }
+
+    const title = typeof volumeInfo.title === "string" ? volumeInfo.title : "";
+    const authors = Array.isArray(volumeInfo.authors)
+      ? volumeInfo.authors.filter(Boolean).join(", ")
+      : "";
+    const publishers = Array.isArray(volumeInfo.publishers)
+      ? volumeInfo.publishers.filter(Boolean).join(", ")
+      : "";
+    const publishedDate = typeof volumeInfo.publishedDate === "string" ? volumeInfo.publishedDate : "";
+
+    return {
+      title,
+      author: authors,
+      publisher: publishers,
+      year: parseYear(publishedDate)
+    };
+  } catch {
+    return null;
+  }
+}
+
 export async function fetchBookByIsbn(rawIsbn: string): Promise<BookMetadata> {
   const normalized = normalizeIsbn(rawIsbn);
   const isbn = normalized.length === 10 ? toIsbn13(normalized) : normalized;
@@ -86,44 +121,61 @@ export async function fetchBookByIsbn(rawIsbn: string): Promise<BookMetadata> {
   const key = `ISBN:${isbn}`;
   const details = payload[key]?.details;
 
-  if (!details) {
-    throw new Error("Nie znaleziono metadanych dla podanego ISBN.");
+  if (details) {
+    const title = typeof details.title === "string" ? details.title : "";
+    const authors = Array.isArray(details.authors)
+      ? details.authors
+          .map((item) => {
+            if (item && typeof item === "object" && "name" in item && typeof item.name === "string") {
+              return item.name;
+            }
+
+            return "";
+          })
+          .filter(Boolean)
+          .join(", ")
+      : "";
+
+    const publishers = Array.isArray(details.publishers)
+      ? details.publishers
+          .map((item) => {
+            if (item && typeof item === "object" && "name" in item && typeof item.name === "string") {
+              return item.name;
+            }
+
+            return "";
+          })
+          .filter(Boolean)
+          .join(", ")
+      : "";
+
+    const publishDate = typeof details.publish_date === "string" ? details.publish_date : "";
+
+    return {
+      isbn,
+      title,
+      author: authors,
+      publisher: publishers,
+      year: parseYear(publishDate)
+    };
   }
 
-  const title = typeof details.title === "string" ? details.title : "";
-  const authors = Array.isArray(details.authors)
-    ? details.authors
-        .map((item) => {
-          if (item && typeof item === "object" && "name" in item && typeof item.name === "string") {
-            return item.name;
-          }
-
-          return "";
-        })
-        .filter(Boolean)
-        .join(", ")
-    : "";
-
-  const publishers = Array.isArray(details.publishers)
-    ? details.publishers
-        .map((item) => {
-          if (item && typeof item === "object" && "name" in item && typeof item.name === "string") {
-            return item.name;
-          }
-
-          return "";
-        })
-        .filter(Boolean)
-        .join(", ")
-    : "";
-
-  const publishDate = typeof details.publish_date === "string" ? details.publish_date : "";
+  const googleBooksData = await fetchFromGoogleBooks(isbn);
+  if (googleBooksData) {
+    return {
+      isbn,
+      title: googleBooksData.title ?? "",
+      author: googleBooksData.author ?? "",
+      publisher: googleBooksData.publisher ?? "",
+      year: googleBooksData.year ?? ""
+    };
+  }
 
   return {
     isbn,
-    title,
-    author: authors,
-    publisher: publishers,
-    year: parseYear(publishDate)
+    title: "",
+    author: "",
+    publisher: "",
+    year: ""
   };
 }
