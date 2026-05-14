@@ -1,5 +1,5 @@
 import { useEffect, useId } from "react";
-import { Html5QrcodeScanner, Html5QrcodeSupportedFormats } from "html5-qrcode";
+import { Html5Qrcode, Html5QrcodeSupportedFormats } from "html5-qrcode";
 
 type IsbnScannerProps = {
   enabled: boolean;
@@ -15,34 +15,76 @@ export default function IsbnScanner({ enabled, onDetected, onError }: IsbnScanne
       return;
     }
 
-    const scanner = new Html5QrcodeScanner(
-      scannerId,
-      {
-        fps: 10,
-        qrbox: { width: 280, height: 140 },
-        formatsToSupport: [
-          Html5QrcodeSupportedFormats.EAN_13,
-          Html5QrcodeSupportedFormats.EAN_8,
-          Html5QrcodeSupportedFormats.UPC_A,
-          Html5QrcodeSupportedFormats.UPC_E,
-          Html5QrcodeSupportedFormats.CODE_128
-        ],
-        rememberLastUsedCamera: true
-      },
-      false
-    );
+    let scanner: Html5Qrcode | null = new Html5Qrcode(scannerId, {
+      formatsToSupport: [
+        Html5QrcodeSupportedFormats.EAN_13,
+        Html5QrcodeSupportedFormats.EAN_8,
+        Html5QrcodeSupportedFormats.UPC_A,
+        Html5QrcodeSupportedFormats.UPC_E,
+        Html5QrcodeSupportedFormats.CODE_128
+      ],
+      verbose: false
+    });
+    let cancelled = false;
 
-    scanner.render(
-      (decodedText) => {
-        onDetected(decodedText);
-        scanner.clear().catch(() => undefined);
-      },
-      () => undefined
-    );
+    const run = async () => {
+      const scanConfig = {
+        fps: 10,
+        qrbox: { width: 300, height: 160 },
+        aspectRatio: 1.7777778,
+        disableFlip: false
+      };
+
+      try {
+        await scanner.start(
+          { facingMode: { exact: "environment" } },
+          scanConfig,
+          (decodedText) => {
+            onDetected(decodedText);
+          },
+          () => undefined
+        );
+      } catch {
+        if (cancelled || !scanner) {
+          return;
+        }
+
+        try {
+          await scanner.start(
+            { facingMode: "environment" },
+            scanConfig,
+            (decodedText) => {
+              onDetected(decodedText);
+            },
+            () => undefined
+          );
+        } catch (cameraError) {
+          const message =
+            cameraError instanceof Error
+              ? cameraError.message
+              : "Camera could not start. On iPhone, use Safari over HTTPS and allow camera access.";
+          onError(message);
+        }
+      }
+    };
+
+    void run();
 
     return () => {
-      scanner.clear().catch(() => undefined);
+      cancelled = true;
       onError("");
+
+      if (!scanner) {
+        return;
+      }
+
+      void scanner
+        .stop()
+        .catch(() => undefined)
+        .then(() => scanner?.clear().catch(() => undefined))
+        .finally(() => {
+          scanner = null;
+        });
     };
   }, [enabled, onDetected, onError, scannerId]);
 
@@ -50,5 +92,10 @@ export default function IsbnScanner({ enabled, onDetected, onError }: IsbnScanne
     return <p>Scanner is paused. Click “Start scanner” to use your camera.</p>;
   }
 
-  return <div id={scannerId} className="scanner-container" />;
+  return (
+    <>
+      <p className="help-text">Tip: on iPhone use Safari, allow camera access, and point the back camera at the barcode.</p>
+      <div id={scannerId} className="scanner-container" />
+    </>
+  );
 }

@@ -7,10 +7,27 @@ APSLibros is a small web app that scans a book barcode (ISBN), deciphers title/a
 ## Features
 
 - Camera ISBN scanning via `html5-qrcode`
+- iPhone-friendly camera scanning (back camera / Safari)
 - Manual ISBN input fallback
+- USB barcode scanner support (keyboard-wedge mode)
 - ISBN-10 and ISBN-13 normalization/validation
 - Open Library metadata lookup and autofill
 - Basic unit tests for ISBN parsing helpers
+
+## Scanning Modes
+
+### iPhone camera
+
+1. Open the app in Safari via HTTPS (`https://annpasz.github.io/APSLibros/`)
+2. Tap **Start scanner** and allow camera permission
+3. Point the back camera at the book barcode
+
+### USB barcode scanner
+
+1. Connect the scanner to your computer/device
+2. Keep focus outside text fields (click blank area/card title)
+3. Scan a barcode; the app captures rapid scanner keystrokes and auto-runs lookup
+4. You can also focus ISBN input and press `Enter` to lookup
 
 ## Tech Stack
 
