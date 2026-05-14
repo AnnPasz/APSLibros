@@ -47,3 +47,16 @@ git push -u origin main
 Example URL format:
 
 `https://github.com/<your-username>/APSLibros.git`
+
+## Publish as a GitHub Page
+
+This repository is configured to deploy automatically to GitHub Pages on every push to `main` using GitHub Actions.
+
+- Expected live URL: `https://annpasz.github.io/APSLibros/`
+- Workflow file: `.github/workflows/deploy-pages.yml`
+
+If this is your first deployment, check GitHub once:
+
+1. Open repository **Settings** → **Pages**
+2. Ensure **Source** is set to **GitHub Actions**
+3. Open the **Actions** tab and confirm the workflow run succeeds
