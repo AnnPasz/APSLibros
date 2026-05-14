@@ -1,5 +1,7 @@
 # APSLibros
 
+[![Deploy to GitHub Pages](https://github.com/AnnPasz/APSLibros/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/AnnPasz/APSLibros/actions/workflows/deploy-pages.yml)
+
 APSLibros is a small web app that scans a book barcode (ISBN), deciphers title/author/publisher/year using Open Library metadata, and auto-populates a book record form.
 
 ## Features
